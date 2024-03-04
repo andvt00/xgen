@@ -37,6 +37,11 @@ func (opt *Options) OnRestriction(ele xml.StartElement, protoTree []interface{})
 
 // EndRestriction handles parsing event on the restriction end elements.
 func (opt *Options) EndRestriction(ele xml.EndElement, protoTree []interface{}) (err error) {
+	if opt.SimpleType.Len() > 0 && opt.Element.Len() > 0 {
+		if opt.Element.Peek().(*Element).Type, err = opt.GetValueType(opt.SimpleType.Peek().(*SimpleType).Base, opt.ProtoTree); err != nil {
+			return
+		}
+	}
 	if opt.Attribute.Len() > 0 && opt.SimpleType.Peek() != nil {
 		opt.Attribute.Peek().(*Attribute).Type, err = opt.GetValueType(opt.SimpleType.Pop().(*SimpleType).Base, opt.ProtoTree)
 		if err != nil {
