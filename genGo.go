@@ -255,6 +255,9 @@ func (gen *CodeGenerator) GoComplexType(v *ComplexType) {
 					}
 				}
 			}
+			if strings.HasPrefix(element.Name, "marker") {
+				xmlOmitempty = ""
+			}
 			content += fmt.Sprintf("\t%s\t%s%s\t`xml:\"%s%s\" json:\"%s,omitempty\"`\n", genGoFieldName(element.Name, false), plural, fieldType, element.Name, xmlOmitempty, element.Name)
 		}
 		if len(v.Base) > 0 {
