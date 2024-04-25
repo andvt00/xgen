@@ -142,10 +142,17 @@ func (opt *Options) Parse() (err error) {
 			File:      path,
 			ProtoTree: opt.ProtoTree,
 			StructAST: map[string]string{},
+			Warning:   []string{},
 		}
 		funcName := fmt.Sprintf("Gen%s", MakeFirstUpperCase(opt.Lang))
 		if err = callFuncByName(generator, funcName, []reflect.Value{}); err != nil {
 			return
+		}
+		if len(generator.Warning) > 0 {
+			fmt.Println("warning path", path)
+			for _, v := range generator.Warning {
+				fmt.Println(v)
+			}
 		}
 	}
 	return

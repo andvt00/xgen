@@ -27,6 +27,7 @@ type CodeGenerator struct {
 	ImportEncodingXML bool // For Go language
 	ProtoTree         []interface{}
 	StructAST         map[string]string
+	Warning           []string
 }
 
 var goBuildinType = map[string]bool{
@@ -143,6 +144,8 @@ func (gen *CodeGenerator) GoSimpleType(v *SimpleType) {
 			fieldName := genGoFieldName(v.Name, true)
 			gen.Field += fmt.Sprintf("%stype %s%s", genFieldComment(fieldName, v.Doc, "//"), fieldName, gen.StructAST[v.Name])
 			return
+		} else {
+			gen.Warning = append(gen.Warning, "duplicate GoSimpleType "+v.Name)
 		}
 	}
 	if v.Union && len(v.MemberTypes) > 0 {
@@ -165,6 +168,8 @@ func (gen *CodeGenerator) GoSimpleType(v *SimpleType) {
 			content += "}\n"
 			gen.StructAST[v.Name] = content
 			gen.Field += fmt.Sprintf("%stype %s%s", genFieldComment(fieldName, v.Doc, "//"), fieldName, gen.StructAST[v.Name])
+		} else {
+			gen.Warning = append(gen.Warning, "duplicate GoSimpleType "+v.Name)
 		}
 		return
 	}
@@ -173,6 +178,8 @@ func (gen *CodeGenerator) GoSimpleType(v *SimpleType) {
 		gen.StructAST[v.Name] = content
 		fieldName := genGoFieldName(v.Name, true)
 		gen.Field += fmt.Sprintf("%stype %s%s", genFieldComment(fieldName, v.Doc, "//"), fieldName, gen.StructAST[v.Name])
+	} else {
+		gen.Warning = append(gen.Warning, "duplicate GoSimpleType "+v.Name)
 	}
 }
 
@@ -273,6 +280,8 @@ func (gen *CodeGenerator) GoComplexType(v *ComplexType) {
 		content += "}\n"
 		gen.StructAST[v.Name] = content
 		gen.Field += fmt.Sprintf("%stype %s%s", genFieldComment(fieldName, v.Doc, "//"), fieldName, gen.StructAST[v.Name])
+	} else {
+		gen.Warning = append(gen.Warning, "duplicate GoComplexType "+v.Name)
 	}
 }
 
@@ -309,6 +318,8 @@ func (gen *CodeGenerator) GoGroup(v *Group) {
 		content += "}\n"
 		gen.StructAST[v.Name] = content
 		gen.Field += fmt.Sprintf("%stype %s%s", genFieldComment(fieldName, v.Doc, "//"), fieldName, gen.StructAST[v.Name])
+	} else {
+		gen.Warning = append(gen.Warning, "duplicate GoGroup "+v.Name)
 	}
 }
 
@@ -332,6 +343,8 @@ func (gen *CodeGenerator) GoAttributeGroup(v *AttributeGroup) {
 		content += "}\n"
 		gen.StructAST[v.Name] = content
 		gen.Field += fmt.Sprintf("%stype %s%s", genFieldComment(fieldName, v.Doc, "//"), fieldName, gen.StructAST[v.Name])
+	} else {
+		gen.Warning = append(gen.Warning, "duplicate GoAttributeGroup "+v.Name)
 	}
 }
 
@@ -346,6 +359,10 @@ func (gen *CodeGenerator) GoElement(v *Element) {
 		gen.StructAST[v.Name] = content
 		fieldName := genGoFieldName(v.Name, false)
 		gen.Field += fmt.Sprintf("%stype %s%s", genFieldComment(fieldName, v.Doc, "//"), fieldName, gen.StructAST[v.Name])
+	} else {
+		if !strings.Contains(v.Name, "_") {
+			gen.Warning = append(gen.Warning, "duplicate GoElement "+v.Name)
+		}
 	}
 }
 
@@ -360,6 +377,8 @@ func (gen *CodeGenerator) GoAttribute(v *Attribute) {
 		gen.StructAST[v.Name] = content
 		fieldName := genGoFieldName(v.Name, true)
 		gen.Field += fmt.Sprintf("%stype %s%s", genFieldComment(fieldName, v.Doc, "//"), fieldName, gen.StructAST[v.Name])
+	} else {
+		gen.Warning = append(gen.Warning, "duplicate GoAttribute "+v.Name)
 	}
 }
 
